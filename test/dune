@@ -1,0 +1,4 @@
+(tests
+ (names ocaml_harfbuzz_test)
+ (package ocaml-harfbuzz)
+ (libraries alcotest ocaml_harfbuzz))

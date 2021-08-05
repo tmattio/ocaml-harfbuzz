@@ -1,0 +1,4 @@
+(library
+ (name ocaml_harfbuzz)
+ (public_name ocaml-harfbuzz)
+ (libraries))
