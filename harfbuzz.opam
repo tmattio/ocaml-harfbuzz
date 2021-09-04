@@ -5,12 +5,13 @@ description: "Harfbuzz bindings for OCaml"
 maintainer: ["Thibaut Mattio"]
 authors: ["Thibaut Mattio"]
 license: "ISC"
-homepage: "https://github.com/tmattio/ocaml-harfbuzz"
-doc: "https://tmattio.github.io/ocaml-harfbuzz/"
-bug-reports: "https://github.com/tmattio/ocaml-harfbuzz/issues"
+homepage: "https://github.com/tmattio/harfbuzz"
+doc: "https://tmattio.github.io/harfbuzz/"
+bug-reports: "https://github.com/tmattio/harfbuzz/issues"
 depends: [
   "ocaml" {>= "4.08.0"}
   "dune"
+  "ctypes"
   "alcotest" {with-test}
   "odoc" {with-doc}
 ]
@@ -28,4 +29,4 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "git+https://github.com/tmattio/ocaml-harfbuzz.git"
+dev-repo: "git+https://github.com/tmattio/harfbuzz.git"

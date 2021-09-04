@@ -1,0 +1,3 @@
+(executable
+ (name render_string)
+ (libraries harfbuzz))

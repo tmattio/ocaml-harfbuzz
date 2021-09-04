@@ -1,0 +1,136 @@
+; The final FFI module, containing all the OCaml bits, and linked with harfbuzz.
+
+(library
+ (name harfbuzz_c)
+ (public_name harfbuzz.c)
+ (wrapped false)
+ (modules harfbuzz_c_generated_functions)
+ (libraries ctypes harfbuzz_c_function_descriptions)
+ (foreign_stubs
+  (language c)
+  (names c_generated_functions)
+  (include_dirs vendor/harfbuzz/src))
+ (foreign_archives harfbuzz)
+ (c_library_flags
+  (:include extra_libs.sexp)))
+
+(install
+ (section lib)
+ (package harfbuzz)
+ (files
+  (vendor/harfbuzz/src/hb.h as hb.h)
+  (vendor/harfbuzz/src/hb-blob.h as hb-blob.h)
+  (vendor/harfbuzz/src/hb-buffer.h as hb-buffer.h)
+  (vendor/harfbuzz/src/hb-common.h as hb-common.h)
+  (vendor/harfbuzz/src/hb-deprecated.h as hb-deprecated.h)
+  (vendor/harfbuzz/src/hb-draw.h as hb-draw.h)
+  (vendor/harfbuzz/src/hb-face.h as hb-face.h)
+  (vendor/harfbuzz/src/hb-font.h as hb-font.h)
+  (vendor/harfbuzz/src/hb-map.h as hb-map.h)
+  (vendor/harfbuzz/src/hb-set.h as hb-set.h)
+  (vendor/harfbuzz/src/hb-shape.h as hb-shape.h)
+  (vendor/harfbuzz/src/hb-shape-plan.h as hb-shape-plan.h)
+  (vendor/harfbuzz/src/hb-style.h as hb-style.h)
+  (vendor/harfbuzz/src/hb-unicode.h as hb-unicode.h)
+  (vendor/harfbuzz/src/hb-version.h as hb-version.h)))
+
+; The vendored harfbuzz.
+
+(rule
+ (targets libharfbuzz.a dllharfbuzz%{ext_dll})
+ (deps
+  (source_tree vendor))
+ (action
+  (progn
+   (bash "cp -r vendor/configure/* vendor/harfbuzz/")
+   (chdir
+    vendor/harfbuzz
+    (progn
+     (bash
+       "sh configure --host `ocamlc -config | awk '/host/ {print $NF}'` 'CC=%{cc}' CFLAGS=-DNDEBUG --silent --enable-silent-rules --enable-static")
+     (ignore-outputs
+      (bash
+        "$([ '%{os_type}' = Unix ] && echo %{make} || echo make) V=0 -j 4 -o aclocal.m4 -o Makefile.in -o configure -o configure.status -o Makefile"))
+     (ignore-outputs
+      (bash
+        "sh libtool --silent --no-warnings --mode install cp src/libharfbuzz.la `pwd`"))))
+   (bash "cp vendor/harfbuzz/libharfbuzz.a .")
+   (ignore-outputs
+    (bash
+      "cp vendor/harfbuzz/libharfbuzz.so.0.0.0 dllharfbuzz.so || cp vendor/harfbuzz/libharfbuzz.0.dylib dllharfbuzz.so || cp vendor/harfbuzz/libharfbuzz-0.dll dllharfbuzz.dll")))))
+
+(rule
+ (targets extra_libs.sexp)
+ (action
+  (ignore-outputs
+   (bash
+     "if ocamlc -config | grep mingw; then echo '(-liphlpapi -lpsapi -luserenv)' > extra_libs.sexp; else echo '()' > extra_libs.sexp; fi"))))
+
+; Everything below is the bindings generation process using ctypes. It produces
+; two OCaml modules, harfbuzz_c_generated_functions and harfbuzz_c_generated_types.
+
+; Type bindings (harfbuzz_c_generated_types).
+
+(library
+ (name harfbuzz_c_type_descriptions)
+ (public_name harfbuzz.c_type_descriptions)
+ (modules harfbuzz_c_type_descriptions)
+ (libraries ctypes))
+
+(executable
+ (name generate_types_start)
+ (modules generate_types_start)
+ (libraries ctypes.stubs harfbuzz_c_type_descriptions))
+
+(rule
+ (with-stdout-to
+  generate_types_step_2.c
+  (run ./generate_types_start.exe)))
+
+; Based partially on
+;   https://github.com/avsm/ocaml-yaml/blob/master/types/stubgen/jbuild#L20
+
+(rule
+ (targets generate_types_step_2.exe)
+ (deps
+  (:c generate_types_step_2.c))
+ (action
+  (bash
+    "%{cc} %{c} -I '%{lib:ctypes:.}' -I %{ocaml_where} -I vendor/harfbuzz/src -o %{targets}")))
+
+(rule
+ (with-stdout-to
+  harfbuzz_c_generated_types.ml
+  (run ./generate_types_step_2.exe)))
+
+; Function bindings.
+
+(library
+ (name harfbuzz_c_function_descriptions)
+ (public_name harfbuzz.c_function_descriptions)
+ (flags
+  (:standard -w -9-16-27))
+ (wrapped false)
+ (modules harfbuzz_c_generated_types harfbuzz_c_function_descriptions
+   harfbuzz_c_types)
+ (libraries ctypes harfbuzz_c_type_descriptions))
+
+(executable
+ (name generate_c_functions)
+ (modules generate_c_functions)
+ (libraries ctypes.stubs harfbuzz_c_function_descriptions))
+
+(executable
+ (name generate_ml_functions)
+ (modules generate_ml_functions)
+ (libraries ctypes.stubs harfbuzz_c_function_descriptions))
+
+(rule
+ (with-stdout-to
+  c_generated_functions.c
+  (run ./generate_c_functions.exe harfbuzz_stub)))
+
+(rule
+ (with-stdout-to
+  harfbuzz_c_generated_functions.ml
+  (run ./generate_ml_functions.exe harfbuzz_stub)))

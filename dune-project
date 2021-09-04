@@ -1,28 +1,28 @@
 (lang dune 2.0)
 
-(name ocaml-harfbuzz)
+(name harfbuzz)
 
-(documentation "https://tmattio.github.io/ocaml-harfbuzz/")
+(documentation "https://tmattio.github.io/harfbuzz/")
 
 (source
- (github tmattio/ocaml-harfbuzz))
+ (github tmattio/harfbuzz))
 
 (license ISC)
 
-(authors
-  "Thibaut Mattio")
+(authors "Thibaut Mattio")
 
-(maintainers
-  "Thibaut Mattio")
+(maintainers "Thibaut Mattio")
 
 (generate_opam_files true)
 
 (package
- (name ocaml-harfbuzz)
+ (name harfbuzz)
  (synopsis "Harfbuzz bindings for OCaml")
  (description "Harfbuzz bindings for OCaml")
  (depends
-  (ocaml (>= 4.08.0))
+  (ocaml
+   (>= 4.08.0))
   dune
+  ctypes
   (alcotest :with-test)
   (odoc :with-doc)))
