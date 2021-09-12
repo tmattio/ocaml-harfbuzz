@@ -9,13 +9,13 @@ Harfbuzz bindings for OCaml
 ### Using Opam
 
 ```bash
-opam install inquire
+opam install harfbuzz
 ```
 
 ### Using Esy
 
 ```bash
-esy add @opam/inquire
+esy add @opam/harfbuzz
 ```
 
 ## Usage

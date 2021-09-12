@@ -1,4 +1,4 @@
 (library
  (name harfbuzz)
  (public_name harfbuzz)
- (libraries))
+ (libraries harfbuzz.c))
