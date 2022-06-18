@@ -14,6 +14,8 @@ module Descriptions (F : Ctypes.TYPE) = struct
     let codepoint : codepoint typ =
       typedef (structure "`Codepoint") "hb_codepoint_t"
 
+    let () = seal codepoint
+
     module Direction = struct
       let invalid = constant "HB_DIRECTION_INVALID" int64_t
 
@@ -85,6 +87,8 @@ module Descriptions (F : Ctypes.TYPE) = struct
 
     let position : position typ =
       typedef (structure "`Position") "hb_position_t"
+
+    let () = seal position
 
     module Script = struct
       let common = constant "HB_SCRIPT_COMMON" int64_t
@@ -928,6 +932,8 @@ module Descriptions (F : Ctypes.TYPE) = struct
       let t : t typ =
         typedef (structure "`Segment_property") "hb_segment_properties_t"
 
+      let () = seal t
+
       let direction = field t "direction" Common.Direction.t
 
       let script = field t "script" Common.Script.t
@@ -1080,12 +1086,16 @@ module Descriptions (F : Ctypes.TYPE) = struct
         (structure "`Get_glyph_h_advance_func")
         "hb_font_get_glyph_h_advance_func_t"
 
+    let () = seal get_glyph_h_advance_func
+
     type get_glyph_h_advances_func = [ `Get_glyph_h_advances_func ] structure
 
     let get_glyph_h_advances_func : get_glyph_h_advances_func typ =
       typedef
         (structure "`Get_glyph_h_advances_func")
         "hb_font_get_glyph_h_advances_func_t"
+
+    let () = seal get_glyph_h_advances_func
 
     type get_glyph_h_kerning_func = [ `Get_glyph_h_kerning_func ] structure
 
@@ -1094,12 +1104,16 @@ module Descriptions (F : Ctypes.TYPE) = struct
         (structure "`Get_glyph_h_kerning_func")
         "hb_font_get_glyph_h_kerning_func_t"
 
+    let () = seal get_glyph_h_kerning_func
+
     type get_glyph_h_origin_func = [ `Get_glyph_h_origin_func ] structure
 
     let get_glyph_h_origin_func : get_glyph_h_origin_func typ =
       typedef
         (structure "`Get_glyph_h_origin_func")
         "hb_font_get_glyph_h_origin_func_t"
+
+    let () = seal get_glyph_h_origin_func
 
     type get_glyph_v_advance_func = [ `Get_glyph_v_advance_func ] structure
 
@@ -1108,12 +1122,16 @@ module Descriptions (F : Ctypes.TYPE) = struct
         (structure "`Get_glyph_v_advance_func")
         "hb_font_get_glyph_v_advance_func_t"
 
+    let () = seal get_glyph_v_advance_func
+
     type get_glyph_v_advances_func = [ `Get_glyph_v_advances_func ] structure
 
     let get_glyph_v_advances_func : get_glyph_v_advances_func typ =
       typedef
         (structure "`Get_glyph_v_advances_func")
         "hb_font_get_glyph_v_advances_func_t"
+
+    let () = seal get_glyph_v_advances_func
 
     type get_glyph_v_origin_func = [ `Get_glyph_v_origin_func ] structure
 
@@ -1122,6 +1140,8 @@ module Descriptions (F : Ctypes.TYPE) = struct
         (structure "`Get_glyph_v_origin_func")
         "hb_font_get_glyph_v_origin_func_t"
 
+    let () = seal get_glyph_v_origin_func
+
     type get_font_h_extents_func = [ `Get_font_h_extents_func ] structure
 
     let get_font_h_extents_func : get_font_h_extents_func typ =
@@ -1129,12 +1149,16 @@ module Descriptions (F : Ctypes.TYPE) = struct
         (structure "`Get_font_h_extents_func")
         "hb_font_get_font_h_extents_func_t"
 
+    let () = seal get_font_h_extents_func
+
     type get_font_v_extents_func = [ `Get_font_v_extents_func ] structure
 
     let get_font_v_extents_func : get_font_v_extents_func typ =
       typedef
         (structure "`Get_font_v_extents_func")
         "hb_font_get_font_v_extents_func_t"
+
+    let () = seal get_font_v_extents_func
 
     module Extents = struct
       type t = [ `Extents ] structure
@@ -1188,7 +1212,7 @@ module Descriptions (F : Ctypes.TYPE) = struct
   module Unicode = struct
     type funcs = [ `Unicode_funcs ] structure
 
-    let t : funcs typ =
+    let funcs : funcs typ =
       typedef (structure "`Unicode_funcs") "hb_unicode_funcs_t"
 
     module Combining_class = struct
@@ -1606,6 +1630,7 @@ module Descriptions (F : Ctypes.TYPE) = struct
 
     let minor = constant "HB_VERSION_MINOR" int
 
-    (* let string = constant "HB_VERSION_STRING" (ptr char) *)
+    (* let string = constant "HB_VERSION_STRING" string *)
+    (* Cannot be bound as a constant. See C.Functions.Version.string *)
   end
 end
